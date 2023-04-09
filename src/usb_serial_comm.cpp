@@ -13,7 +13,7 @@ USBSerialComm::~USBSerialComm()
 void USBSerialComm::init()
 {
     USB.begin();
-    USBSerial.setRxBufferSize(262162);
+    USBSerial.setRxBufferSize(65536);
     USBSerial.begin(921600);
 }
 
@@ -32,17 +32,18 @@ int USBSerialComm::readCommand()
 
 uint_fast32_t USBSerialComm::readPayloadLength()
 {
-    if (USBSerial.available() > 0)
+    int startBytes = 0;
+    while (USBSerial.available() > 0)
     {
         char length[4] = "";
         size_t readLength = USBSerial.readBytes(length, 4);
-        if (readLength < sizeof(size_t))
+        startBytes += readLength;
+        if (startBytes == 4)
         {
-            return 0;
+            uint_fast32_t number = 0;
+            memcpy(&number, &length, 4);
+            return number;
         }
-        uint_fast32_t number = 0;
-        memcpy(&number, &length, 4);
-        return number;
     }
     return 0;
 }
@@ -61,6 +62,7 @@ std::tuple<uint_fast32_t, char *> USBSerialComm::readPayload()
     size_t totalBytesRead = 0;
     while (USBSerial.available() > 0)
     {
+        lastPackageReceived = millis() + USB_TIMEOUT;
         // reallocate buffer, if it needs to be bigger
         if (length > currentBufferLength)
         {
@@ -78,9 +80,7 @@ std::tuple<uint_fast32_t, char *> USBSerialComm::readPayload()
 
         if (totalBytesRead < length)
         {
-            char byteBuffer[1024] = "";
-            size_t currentBytesRead = USBSerial.readBytes(byteBuffer, std::min<unsigned int>(length - totalBytesRead, sizeof(byteBuffer)));
-            memcpy(buffer + totalBytesRead, byteBuffer, currentBytesRead);
+            size_t currentBytesRead = USBSerial.readBytes(buffer + totalBytesRead, std::min<unsigned int>(length - totalBytesRead, 2048));
             totalBytesRead += currentBytesRead;
         }
         else
@@ -88,5 +88,18 @@ std::tuple<uint_fast32_t, char *> USBSerialComm::readPayload()
             return std::make_tuple(totalBytesRead, buffer);
         }
     }
-    return std::make_tuple(totalBytesRead, buffer);
+
+    if (totalBytesRead == length)
+    {
+        return std::make_tuple(totalBytesRead, buffer);
+    }
+    else
+    {
+        return noValue;
+    }
+}
+
+bool USBSerialComm::connected()
+{
+    return (lastPackageReceived > millis());
 }
