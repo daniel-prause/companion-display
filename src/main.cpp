@@ -1,27 +1,49 @@
+#include "usb_serial_comm.h"
 #include <SPI.h>
 
 #include <TFT_eSPI.h> // Hardware-specific library
 
+bool trigger = false;
 TFT_eSPI tft = TFT_eSPI(); // Invoke custom library
-
-void setup(void)
+unsigned long timeBegin = millis();
+int totalBytes = 0;
+USBSerialComm comm;
+void setup()
 {
-  tft.setRotation(5);
+  comm.init();
+  // init tft
   tft.init();
-
-  tft.fillScreen(TFT_BLACK);
-  tft.drawRect(0, 0, 320, 170, TFT_NAVY);
-
-  // Set "cursor" at top left corner of display (0,0) and select font 4
-  tft.setCursor(0, 0, 4);
-
-  // Set the font colour to be white with a black background
-  tft.setTextColor(TFT_WHITE);
-  tft.println("TEST Hallo!");
-  delay(5000);
+  tft.setRotation(5);
+  tft.setSwapBytes(true);
+  tft.fillScreen(UINT32_MAX / 2);
+  tft.setTextPadding(0);
+  tft.setTextColor(0);
 }
 
 void loop()
 {
-  delay(5000);
+
+  auto payload = comm.readPayload();
+  if (std::get<0>(payload) > 0)
+  {
+    if (!trigger)
+    {
+      timeBegin = millis();
+    }
+    trigger = true;
+    int readBytes = std::get<0>(payload);
+    totalBytes += readBytes;
+  }
+
+  if ((millis() - timeBegin) >= 1000)
+  {
+    char str[80] = "";
+    tft.fillRect(0, 0, 200, 20, UINT32_MAX);
+    tft.drawString(str, 0, 0);
+    sprintf(str, "Time: {%d} Bytes: {%d}", (millis() - timeBegin), totalBytes);
+    tft.drawString(str, 0, 0);
+    timeBegin = millis();
+    totalBytes = 0;
+    trigger = false;
+  }
 }
