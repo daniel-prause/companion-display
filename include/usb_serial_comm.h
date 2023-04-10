@@ -19,6 +19,7 @@ public:
     // second step
     std::tuple<uint_fast32_t, char *> readPayload();
     bool connected();
+    size_t read_raw(char *buffer, unsigned int len);
 
 private:
     unsigned long lastPackageReceived = 0;

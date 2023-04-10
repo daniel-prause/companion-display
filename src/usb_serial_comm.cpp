@@ -13,7 +13,7 @@ USBSerialComm::~USBSerialComm()
 void USBSerialComm::init()
 {
     USB.begin();
-    USBSerial.setRxBufferSize(65536);
+    USBSerial.setRxBufferSize(262144);
     USBSerial.begin(921600);
 }
 
@@ -80,7 +80,7 @@ std::tuple<uint_fast32_t, char *> USBSerialComm::readPayload()
 
         if (totalBytesRead < length)
         {
-            size_t currentBytesRead = USBSerial.readBytes(buffer + totalBytesRead, std::min<unsigned int>(length - totalBytesRead, 2048));
+            size_t currentBytesRead = USBSerial.readBytes(buffer + totalBytesRead, std::min<unsigned int>(length - totalBytesRead, 8192));
             totalBytesRead += currentBytesRead;
         }
         else
@@ -102,4 +102,16 @@ std::tuple<uint_fast32_t, char *> USBSerialComm::readPayload()
 bool USBSerialComm::connected()
 {
     return (lastPackageReceived > millis());
+}
+
+size_t USBSerialComm::read_raw(char *buffer, unsigned int len)
+{
+    if (USBSerial.available() > 0)
+    {
+        return USBSerial.readBytes(buffer, len);
+    }
+    else
+    {
+        return 0;
+    }
 }
