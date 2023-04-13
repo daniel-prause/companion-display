@@ -48,6 +48,7 @@ unsigned short convert_and_combine(uint8_t r, uint8_t g, uint8_t b)
 
   return combine_bytes(x1, x2);
 }
+uint16_t *last_image = new uint16_t[320 * 170];
 
 void loop()
 {
@@ -71,7 +72,6 @@ void loop()
     webp_data.bytes = new uint8_t[webp_data.size];
     auto decoded_data = WebPDecodeRGB((const uint8_t *)next_packet.c_str(), webp_data.size, &width, &height);
     // rgb888 to rgb565
-    uint16_t *last_image = new uint16_t[320 * 170];
     if (decoded_data != NULL)
     {
       int x = 0;
@@ -86,7 +86,6 @@ void loop()
 
       tft.pushImage(0, 0, 320, 170, last_image);
     }
-    delete last_image;
 
     WebPFree(decoded_data);
     delete webp_data.bytes;
