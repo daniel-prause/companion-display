@@ -9,7 +9,6 @@ USBSerialComm::USBSerialComm()
 
 USBSerialComm::~USBSerialComm()
 {
-    free(buffer);
 }
 
 void USBSerialComm::init()

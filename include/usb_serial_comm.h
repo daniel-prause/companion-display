@@ -19,6 +19,5 @@ public:
 private:
     unsigned long lastPackageReceived = 0;
     size_t currentBufferLength = 0;
-    char *buffer = (char *)malloc(320 * 170 * 3);
     USBCDC USBSerial;
 };
