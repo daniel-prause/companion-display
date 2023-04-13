@@ -3,6 +3,7 @@
 #include <SPI.h>
 #include "packetizer.h"
 #include <TFT_eSPI.h> // Hardware-specific library
+#include <webp/demux.h>
 
 bool trigger = false;
 TFT_eSPI tft = TFT_eSPI(); // Invoke custom library
@@ -26,6 +27,28 @@ void setup()
 }
 
 unsigned int total_bytes_read = 0;
+int width = 0;
+int height = 0;
+int memory_size = 0;
+
+// combine two bytes
+unsigned short combine_bytes(byte b1, byte b2)
+{
+  int combined = b1 << 8 | b2;
+  return combined;
+}
+
+// convert to 565
+unsigned short convert_and_combine(uint8_t r, uint8_t g, uint8_t b)
+{
+  unsigned int x1, x2; // The container for resulting 2 bytes
+
+  x1 = (r & 0xF8) | (g >> 5);        // Take 5 bits of Red component and 3 bits of G component
+  x2 = ((g & 0x1C) << 3) | (b >> 3); // Take remaining 3 Bits of G component and 5 bits of Blue component
+
+  return combine_bytes(x1, x2);
+}
+
 void loop()
 {
 
@@ -42,31 +65,34 @@ void loop()
   if (next_packet.length() != 0)
   {
     total_packets += 1;
-  }
-  if (total_bytes_read != old_total_bytes_read)
-  {
-
-    char str[80] = "";
-    tft.fillRect(0, 0, 200, 20, UINT32_MAX);
-    sprintf(str, "BYTES: {%d} Packets: {%d}", total_bytes_read, total_packets);
-    tft.println(str);
-    tft.setCursor(0, 0);
-  }
-
-  /*
-  if (comm.connected())
-  {
-    if (std::get<0>(payload) > 0)
+    // decode packet
+    WebPData webp_data;
+    webp_data.size = next_packet.length();
+    webp_data.bytes = new uint8_t[webp_data.size];
+    auto decoded_data = WebPDecodeRGB((const uint8_t *)next_packet.c_str(), webp_data.size, &width, &height);
+    // rgb888 to rgb565
+    uint16_t *last_image = new uint16_t[320 * 170];
+    if (decoded_data != NULL)
     {
-      char str[80] = "";
-      tft.fillRect(0, 0, 200, 20, UINT32_MAX);
-      sprintf(str, "BYTES: {%d}", std::get<0>(payload));
-      tft.println(str);
-      tft.setCursor(0, 0);
+      int x = 0;
+      for (int i = 0; i < 320 * 170 * 3; i += 3)
+      {
+        uint8_t r = decoded_data[i];
+        uint8_t g = decoded_data[i + 1];
+        uint8_t b = decoded_data[i + 2];
+        last_image[x] = convert_and_combine(r, g, b);
+        x++;
+      }
+
+      tft.pushImage(0, 0, 320, 170, last_image);
     }
+    delete last_image;
+
+    WebPFree(decoded_data);
+    delete webp_data.bytes;
   }
-  else
+  if (!comm.connected())
   {
     tft.pushImage(0, 0, 320, 170, (const uint16_t *)&disconnected_image);
-  }*/
+  }
 }
