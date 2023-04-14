@@ -49,5 +49,6 @@ void loop()
   if (!comm.connected())
   {
     tft.pushImage(0, 0, 320, 170, (const uint16_t *)&disconnected_image);
+    packetizer.clear_backlog();
   }
 }

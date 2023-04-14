@@ -9,6 +9,12 @@ void Packetizer::append_to_backlog(char *buffer, unsigned int len)
     backlog.append(buffer, len);
 }
 
+// if the connection breaks, we will clear the backlog
+void Packetizer::clear_backlog()
+{
+    backlog = std::string();
+}
+
 std::string Packetizer::next_packet() // can be of length 0, than we have to ignore it
 {
     if (backlog.length() >= 4)
