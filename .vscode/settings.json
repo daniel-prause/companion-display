@@ -47,7 +47,18 @@
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "cinttypes": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "vp8i_dec.h": "c",
+        "common_dec.h": "c",
+        "vp8li_dec.h": "c",
+        "bit_reader_utils.h": "c",
+        "webpi_dec.h": "c"
     },
-    "cmake.configureOnOpen": false
+    "cmake.configureOnOpen": false,
+    "explorer.autoRevealExclude": {
+        "**/lib": true
+    },
+    "search.exclude": {
+        "**/lib": true
+    }
 }

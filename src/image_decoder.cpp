@@ -14,29 +14,24 @@ ImageDecoder::~ImageDecoder()
 bool ImageDecoder::decode(uint16_t *buffer, unsigned int width, unsigned int height)
 {
     // decode packet
-    WebPData webp_data;
-    webp_data.size = image.length();
-    webp_data.bytes = new uint8_t[webp_data.size];
-    int decoded_width = 0;
-    int decoded_height = 0;
-    auto decoded_data = WebPDecodeRGB((const uint8_t *)image.c_str(), webp_data.size, &decoded_width, &decoded_height);
-    // rgb888 to rgb565
+    WebPDecoderConfig config;
+    WebPInitDecoderConfig(&config);
+    config.options.use_threads = true;
+    auto decoded_data = WebPDecode((const uint8_t *)image.c_str(), image.length(), &config);
+    //  rgb888 to rgb565
     bool return_value = false;
-    if (decoded_data != NULL)
+    if (decoded_data == VP8_STATUS_OK)
     {
-        int x = 0;
         for (int i = 0; i < width * height * 3; i += 3)
         {
-            uint8_t r = decoded_data[i];
-            uint8_t g = decoded_data[i + 1];
-            uint8_t b = decoded_data[i + 2];
-            buffer[x] = convert_and_combine(r, g, b);
-            x++;
+            uint8_t r = config.output.u.RGBA.rgba[i];
+            uint8_t g = config.output.u.RGBA.rgba[i + 1];
+            uint8_t b = config.output.u.RGBA.rgba[i + 2];
+            buffer[i / 3] = convert_and_combine(r, g, b);
         }
         return_value = true;
-        WebPFree(decoded_data);
     }
-    delete webp_data.bytes;
+    WebPFreeDecBuffer(&config.output);
     return return_value;
 }
 
