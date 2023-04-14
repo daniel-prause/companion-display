@@ -35,3 +35,8 @@ size_t USBSerialComm::read_raw(char *buffer, unsigned int len)
         return 0;
     }
 }
+
+size_t USBSerialComm::write_raw(char *buffer, unsigned int len)
+{
+    return USBSerial.write(buffer, len);
+}

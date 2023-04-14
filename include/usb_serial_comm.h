@@ -15,6 +15,7 @@ public:
     void init();
     bool connected();
     size_t read_raw(char *buffer, unsigned int len);
+    size_t write_raw(char *buffer, unsigned int len);
 
 private:
     unsigned long lastPackageReceived = 0;

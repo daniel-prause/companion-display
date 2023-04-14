@@ -5,14 +5,9 @@
 #include <TFT_eSPI.h> // Hardware-specific library
 #include <webp/demux.h>
 
-bool trigger = false;
 TFT_eSPI tft = TFT_eSPI(); // Invoke custom library
-unsigned long timeBegin = millis();
-int totalBytes = 0;
 USBSerialComm comm;
-int fps = 0;
 Packetizer packetizer = Packetizer();
-unsigned int total_packets = 0;
 
 void setup()
 {
@@ -65,7 +60,6 @@ void loop()
   std::string next_packet = packetizer.next_packet();
   if (next_packet.length() != 0)
   {
-    total_packets += 1;
     // decode packet
     WebPData webp_data;
     webp_data.size = next_packet.length();
