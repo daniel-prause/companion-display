@@ -1,15 +1,21 @@
 #pragma once
 #include <stdint.h>
-#include <PNGdec.h>
+#include <webp/demux.h>
+#include <string>
+
 class ImageDecoder
 {
 public:
-    ImageDecoder();
+    ImageDecoder(std::string);
     ~ImageDecoder();
-    void decode(char *buffer, size_t length);
+    bool decode(uint16_t *buffer, unsigned int width = 320, unsigned int height = 170);
 
 private:
-    uint8_t *buffer = 0;
-    uint32_t current_image_length = 0;
-    PNG png;
+    std::string image;
+
+    // combine two bytes
+    inline unsigned short combine_bytes(uint8_t b1, uint8_t b2);
+
+    // convert to 565
+    inline unsigned short convert_and_combine(uint8_t r, uint8_t g, uint8_t b);
 };
