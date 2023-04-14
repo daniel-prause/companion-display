@@ -28,7 +28,7 @@ size_t USBSerialComm::read_raw(char *buffer, unsigned int len)
     if (USBSerial.available() > 0)
     {
         lastPackageReceived = millis() + USB_TIMEOUT;
-        return USBSerial.readBytes(buffer, len);
+        return USBSerial.read(buffer, len);
     }
     else
     {

@@ -29,7 +29,8 @@ void loop()
   char buffer[4096] = "";
 
   // append to packetizer
-  packetizer.append_to_backlog(buffer, comm.read_raw(buffer, sizeof(buffer)));
+  size_t len = comm.read_raw(buffer, sizeof(buffer));
+  packetizer.append_to_backlog(buffer, len);
 
   std::string next_packet = packetizer.next_packet();
   if (next_packet.length() != 0)

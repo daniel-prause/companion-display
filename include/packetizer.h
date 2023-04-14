@@ -14,4 +14,5 @@ private:
     std::string backlog;
     bool check_start_bytes(std::string);
     bool check_stop_bytes(std::string);
+    bool in_error_state = false;
 };
