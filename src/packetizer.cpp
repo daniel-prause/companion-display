@@ -25,9 +25,43 @@ std::string Packetizer::next_packet() // can be of length 0, than we have to ign
         if ((backlog.length() - 4) >= number)
         {
             std::string buff = backlog.substr(4, number);
-            backlog.erase(0, number + 4);
-            return buff;
+            if (check_start_bytes(buff) && check_stop_bytes(buff))
+            {
+                backlog.erase(0, number + 4);
+                return buff.substr(4, buff.length() - 4);
+            }
+            else
+            {
+                auto found = backlog.find("ADAD"); // look for stopbit, ignore incomplete packet
+                if (found != std::string::npos)
+                {
+                    backlog.erase(0, found + 4);
+                }
+                else
+                {
+                    // erase everything
+                    backlog = std::string();
+                }
+            }
         }
     }
     return std::string();
+}
+
+bool Packetizer::check_start_bytes(std::string packet)
+{
+    if (packet.substr(0, 4) == "DADA")
+    {
+        return true;
+    }
+    return false;
+}
+
+bool Packetizer::check_stop_bytes(std::string packet)
+{
+    if (packet.substr(packet.length() - 4, 4) == "ADAD")
+    {
+        return true;
+    }
+    return false;
 }
