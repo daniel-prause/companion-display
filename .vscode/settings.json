@@ -52,7 +52,9 @@
         "common_dec.h": "c",
         "vp8li_dec.h": "c",
         "bit_reader_utils.h": "c",
-        "webpi_dec.h": "c"
+        "webpi_dec.h": "c",
+        "bitset": "cpp",
+        "regex": "cpp"
     },
     "cmake.configureOnOpen": false,
     "explorer.autoRevealExclude": {
