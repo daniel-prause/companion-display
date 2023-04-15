@@ -8,6 +8,7 @@
 TFT_eSPI tft; // Invoke custom library
 USBSerialComm comm;
 Packetizer packetizer;
+ImageDecoder image_decoder;
 uint16_t *last_image = new uint16_t[320 * 170];
 
 void setup()
@@ -35,8 +36,7 @@ void loop()
   std::string next_packet = packetizer.next_packet();
   if (next_packet.length() != 0)
   {
-    ImageDecoder image_decoder(next_packet);
-    image_decoder.decode(last_image);
+    image_decoder.decode(next_packet, last_image);
     tft.pushImage(0, 0, 320, 170, last_image);
   }
 

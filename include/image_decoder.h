@@ -6,9 +6,9 @@
 class ImageDecoder
 {
 public:
-    ImageDecoder(std::string);
+    ImageDecoder();
     ~ImageDecoder();
-    bool decode(uint16_t *buffer, unsigned int width = 320, unsigned int height = 170);
+    bool decode(std::string image, uint16_t *buffer, unsigned int width = 320, unsigned int height = 170);
 
 private:
     std::string image;
@@ -18,4 +18,6 @@ private:
 
     // convert to 565
     inline unsigned short convert_and_combine(uint8_t r, uint8_t g, uint8_t b);
+    // decode packet
+    WebPDecoderConfig config;
 };

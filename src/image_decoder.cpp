@@ -2,21 +2,18 @@
 #include <memory>
 
 // bpp - 1 = 8bit, 2 = 16 bit, 3 = 24 bit
-ImageDecoder::ImageDecoder(std::string image)
-    : image(image)
+ImageDecoder::ImageDecoder()
 {
+    WebPInitDecoderConfig(&config);
+    config.options.use_threads = true;
 }
 
 ImageDecoder::~ImageDecoder()
 {
 }
 
-bool ImageDecoder::decode(uint16_t *buffer, unsigned int width, unsigned int height)
+bool ImageDecoder::decode(std::string image, uint16_t *buffer, unsigned int width, unsigned int height)
 {
-    // decode packet
-    WebPDecoderConfig config;
-    WebPInitDecoderConfig(&config);
-    config.options.use_threads = true;
     auto decoded_data = WebPDecode((const uint8_t *)image.c_str(), image.length(), &config);
     //  rgb888 to rgb565
     bool return_value = false;
