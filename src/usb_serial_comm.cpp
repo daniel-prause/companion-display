@@ -1,7 +1,7 @@
 #include "usb_serial_comm.h"
 #include <TFT_eSPI.h> // Hardware-specific library
 #include <algorithm>
-#define USB_TIMEOUT 1000;
+constexpr unsigned int USB_TIMEOUT = 1000;
 
 USBSerialComm::USBSerialComm()
 {

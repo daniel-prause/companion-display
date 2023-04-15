@@ -19,6 +19,5 @@ public:
 
 private:
     unsigned long lastPackageReceived = 0;
-    size_t currentBufferLength = 0;
     USBCDC USBSerial;
 };
