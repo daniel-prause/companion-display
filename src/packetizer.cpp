@@ -42,9 +42,8 @@ std::string Packetizer::next_packet() // can be of length 0, than we have to ign
             {
                 backlog.erase(0, number + 4);
                 std::string escaped = buff.substr(4, number - 4);
-                escaped = std::regex_replace(escaped, std::regex("DD"), "D");
-                escaped = std::regex_replace(escaped, std::regex("AA"), "A");
-
+                replace(escaped, "DD", "D");
+                replace(escaped, "AA", "A");
                 return escaped;
             }
             else
@@ -58,18 +57,20 @@ std::string Packetizer::next_packet() // can be of length 0, than we have to ign
 
 bool Packetizer::check_start_bytes(std::string packet)
 {
-    if (packet.substr(0, 4) == "DADA")
-    {
-        return true;
-    }
-    return false;
+    return packet.compare(0, 4, "DADA") == 0;
 }
 
 bool Packetizer::check_stop_bytes(std::string packet)
 {
-    if (packet.substr(packet.length() - 4, 4) == "ADAD")
+    return packet.compare(packet.length() - 4, 4, "ADAD") == 0;
+}
+
+void Packetizer::replace(std::string &str, std::string substring, std::string replaceable)
+{
+    size_t pos = 0;
+    while ((pos = str.find(substring, pos)) != std::string::npos)
     {
-        return true;
+        str.replace(pos, substring.length(), replaceable);
+        pos += replaceable.length();
     }
-    return false;
 }
