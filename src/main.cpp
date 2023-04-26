@@ -33,11 +33,26 @@ void loop()
   packetizer.append_to_backlog(buffer, len);
 
   // try to build next packet
-  std::string next_packet = packetizer.next_packet();
-  if (next_packet.length() != 0)
+  auto next_packet = packetizer.next_packet();
+  if (std::get<0>(next_packet) != 0)
   {
-    image_decoder.decode(next_packet, last_image);
-    tft.pushImage(0, 0, 320, 170, last_image);
+    switch (std::get<0>(next_packet))
+    {
+    case 228:
+      image_decoder.decode(std::get<1>(next_packet), last_image);
+      tft.pushImage(0, 0, 320, 170, last_image);
+      break;
+    case 17:
+      ledcSetup(0, 10000, 8);
+      ledcAttachPin(38, 0);
+      ledcWrite(0, 0);
+      break;
+    case 18:
+      ledcSetup(0, 10000, 8);
+      ledcAttachPin(38, 0);
+      ledcWrite(0, 255);
+      break;
+    }
   }
 
   if (!comm.connected())

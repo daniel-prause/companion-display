@@ -17,7 +17,7 @@ void Packetizer::clear_backlog()
     backlog = std::string();
 }
 
-std::string Packetizer::next_packet() // can be of length 0, than we have to ignore it
+std::tuple<uint8_t, std::string> Packetizer::next_packet() // can be of length 0, than we have to ignore it
 {
 
     if (in_error_state)
@@ -28,7 +28,12 @@ std::string Packetizer::next_packet() // can be of length 0, than we have to ign
             in_error_state = false;
             backlog.erase(0, found + 4);
         }
-        return std::string();
+        return std::make_tuple(0, std::string());
+    }
+    if (backlog.length() >= 1 && last_command == 0)
+    {
+        memcpy(&last_command, backlog.c_str(), 1);
+        backlog.erase(0, 1);
     }
     if (backlog.length() >= 4)
     {
@@ -44,15 +49,23 @@ std::string Packetizer::next_packet() // can be of length 0, than we have to ign
                 std::string escaped = buff.substr(4, number - 4);
                 replace(escaped, "DD", "D");
                 replace(escaped, "AA", "A");
-                return escaped;
+                auto retval = std::make_tuple(last_command, escaped);
+                last_command = 0;
+                return retval;
             }
             else
             {
                 in_error_state = true;
+                last_command = 0;
             }
         }
     }
-    return std::string();
+    return std::make_tuple(0, std::string());
+}
+
+uint8_t Packetizer::next_command()
+{
+    return last_command;
 }
 
 bool Packetizer::check_start_bytes(std::string packet)
