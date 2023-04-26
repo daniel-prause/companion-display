@@ -35,19 +35,18 @@ std::tuple<uint8_t, std::string> Packetizer::next_packet() // can be of length 0
         last_command = backlog[0];
         backlog.erase(0, 1);
     }
-    if (backlog.length() >= 4)
+    if (backlog.length() >= 3)
     {
-        uint_fast32_t number = uint_fast32_t((unsigned char)(backlog[3]) << 24 |
-                                             (unsigned char)(backlog[2]) << 16 |
+        uint_fast32_t number = uint_fast32_t((unsigned char)(backlog[2]) << 16 |
                                              (unsigned char)(backlog[1]) << 8 |
                                              (unsigned char)(backlog[0]));
 
-        if ((backlog.length() - 4) >= number)
+        if ((backlog.length() - 3) >= number)
         {
-            std::string buff = backlog.substr(4, number);
+            std::string buff = backlog.substr(3, number);
             if (check_start_bytes(buff) && check_stop_bytes(buff) && number <= 320 * 170 * 3 && number > 0)
             {
-                backlog.erase(0, number + 4);
+                backlog.erase(0, number + 3);
                 std::string escaped = buff.substr(4, number - 4);
                 replace(escaped, "DD", "D");
                 replace(escaped, "AA", "A");
