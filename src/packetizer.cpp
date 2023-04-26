@@ -32,13 +32,15 @@ std::tuple<uint8_t, std::string> Packetizer::next_packet() // can be of length 0
     }
     if (backlog.length() >= 1 && last_command == 0)
     {
-        memcpy(&last_command, backlog.c_str(), 1);
+        last_command = backlog[0];
         backlog.erase(0, 1);
     }
     if (backlog.length() >= 4)
     {
-        uint_fast32_t number = 0;
-        memcpy(&number, backlog.c_str(), 4);
+        uint_fast32_t number = uint_fast32_t((unsigned char)(backlog[3]) << 24 |
+                                             (unsigned char)(backlog[2]) << 16 |
+                                             (unsigned char)(backlog[1]) << 8 |
+                                             (unsigned char)(backlog[0]));
 
         if ((backlog.length() - 4) >= number)
         {
@@ -63,7 +65,7 @@ std::tuple<uint8_t, std::string> Packetizer::next_packet() // can be of length 0
     return std::make_tuple(0, std::string());
 }
 
-uint8_t Packetizer::next_command()
+uint_fast8_t Packetizer::next_command()
 {
     return last_command;
 }
