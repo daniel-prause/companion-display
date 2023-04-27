@@ -34,6 +34,12 @@ std::tuple<uint8_t, std::string> Packetizer::next_packet() // can be of length 0
     {
         last_command = backlog[0];
         backlog.erase(0, 1);
+        if (last_command != 0 && last_command != 228)
+        {
+            auto retval = std::make_tuple(last_command, std::string());
+            last_command = 0;
+            return retval;
+        }
     }
     if (backlog.length() >= 3)
     {

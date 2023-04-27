@@ -42,12 +42,12 @@ void loop()
       image_decoder.decode(std::get<1>(next_packet), last_image);
       tft.pushImage(0, 0, 320, 170, last_image);
       break;
-    case 17:
+    case 18:
       ledcSetup(0, 10000, 8);
       ledcAttachPin(38, 0);
       ledcWrite(0, 0);
       break;
-    case 18:
+    case 19:
       ledcSetup(0, 10000, 8);
       ledcAttachPin(38, 0);
       ledcWrite(0, 255);
