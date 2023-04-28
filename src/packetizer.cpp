@@ -53,7 +53,7 @@ std::tuple<uint8_t, std::string> Packetizer::next_packet() // can be of length 0
             if (check_start_bytes(buff) && check_stop_bytes(buff) && number <= 320 * 170 * 3 && number > 0)
             {
                 backlog.erase(0, number + 3);
-                std::string escaped = buff.substr(4, number - 4);
+                std::string escaped = buff.substr(4, number - 8);
                 replace(escaped, "DD", "D");
                 replace(escaped, "AA", "A");
                 auto retval = std::make_tuple(last_command, escaped);

@@ -34,25 +34,27 @@ void loop()
 
   // try to build next packet
   auto next_packet = packetizer.next_packet();
-  if (std::get<0>(next_packet) != 0)
+  auto command = std::get<0>(next_packet);
+  auto payload = std::get<1>(next_packet);
+
+  switch (command)
   {
-    switch (std::get<0>(next_packet))
-    {
-    case 228:
-      image_decoder.decode(std::get<1>(next_packet), last_image);
-      tft.pushImage(0, 0, 320, 170, last_image);
-      break;
-    case 18:
-      ledcSetup(0, 10000, 8);
-      ledcAttachPin(38, 0);
-      ledcWrite(0, 0);
-      break;
-    case 19:
-      ledcSetup(0, 10000, 8);
-      ledcAttachPin(38, 0);
-      ledcWrite(0, 255);
-      break;
-    }
+  case 228:
+  {
+    bool decoding_status = image_decoder.decode(payload, last_image);
+    tft.pushImage(0, 0, 320, 170, last_image);
+    break;
+  }
+  case 18:
+    ledcSetup(0, 10000, 8);
+    ledcAttachPin(38, 0);
+    ledcWrite(0, 0);
+    break;
+  case 19:
+    ledcSetup(0, 10000, 8);
+    ledcAttachPin(38, 0);
+    ledcWrite(0, 255);
+    break;
   }
 
   if (!comm.connected())
