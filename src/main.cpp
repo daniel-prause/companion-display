@@ -41,7 +41,10 @@ void loop()
   {
   case 228:
   {
-    bool decoding_status = image_decoder.decode(payload, last_image);
+    if (!payload.empty())
+    {
+      image_decoder.decode(payload, last_image);
+    }
     tft.pushImage(0, 0, 320, 170, last_image);
     break;
   }
