@@ -48,6 +48,11 @@ void loop()
     tft.pushImage(0, 0, 320, 170, last_image);
     break;
   }
+  case 229:
+  {
+    tft.pushImage(0, 0, 320, 170, last_image);
+    break;
+  }
   case 18:
     ledcSetup(0, 10000, 8);
     ledcAttachPin(38, 0);
