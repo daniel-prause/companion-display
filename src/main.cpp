@@ -38,6 +38,7 @@ void loop()
   auto next_packet = packetizer.next_packet();
   auto command = std::get<0>(next_packet);
   auto payload = std::get<1>(next_packet);
+  bool sleeping = false;
 
   switch (command)
   {
@@ -59,17 +60,29 @@ void loop()
     ledcSetup(0, 10000, 8);
     ledcAttachPin(38, 0);
     ledcWrite(0, 0);
+    sleeping = true;
     break;
   case 19:
     ledcSetup(0, 10000, 8);
     ledcAttachPin(38, 0);
     ledcWrite(0, 255);
+    sleeping = false;
     break;
   }
 
+  // show disconnected image
   if (!comm.connected())
   {
     tft.pushImage(0, 0, 320, 170, (const uint16_t *)&disconnected_image);
     packetizer.clear_backlog();
+  }
+
+  // auto sleep mode
+  if ((comm.last_package_received() + 60000 < millis()) && !sleeping)
+  {
+    sleeping = true;
+    ledcSetup(0, 10000, 8);
+    ledcAttachPin(38, 0);
+    ledcWrite(0, 0);
   }
 }

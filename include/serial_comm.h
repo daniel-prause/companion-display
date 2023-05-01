@@ -14,6 +14,7 @@ public:
     ~SerialComm();
     void init();
     bool connected();
+    unsigned long last_package_received();
     size_t read_raw(char *buffer, unsigned int len);
     size_t write_raw(char *buffer, unsigned int len);
 

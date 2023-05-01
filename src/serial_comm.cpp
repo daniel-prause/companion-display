@@ -42,3 +42,8 @@ size_t SerialComm::write_raw(char *buffer, unsigned int len)
 {
     return Serial.write(buffer, len);
 }
+
+unsigned long SerialComm::last_package_received()
+{
+    return lastPackageReceived;
+}
