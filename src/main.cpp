@@ -9,14 +9,16 @@ TFT_eSPI tft; // Invoke custom library
 SerialComm comm;
 Packetizer packetizer;
 ImageDecoder image_decoder;
-uint16_t *last_image = new uint16_t[320 * 170];
+uint16_t *last_image = new uint16_t[320 * 170]{};
 
 void setup()
 {
   // init usb comm
   comm.init();
   // init tft
+  delay(100);
   tft.init();
+  delay(1000);
   tft.setRotation(5);
   tft.setSwapBytes(true);
   tft.setTextPadding(0);
