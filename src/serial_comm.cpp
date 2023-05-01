@@ -16,10 +16,8 @@ void SerialComm::init()
     Serial.setRxBufferSize(262144);
 
     // serial delay
-    unsigned long ulngStart = millis();
     Serial.begin(921600);
-    while (!Serial && ((millis() - ulngStart) <= 666))
-        ;
+    delay(500);
 }
 
 bool SerialComm::connected()
