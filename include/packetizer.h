@@ -16,6 +16,7 @@ private:
     bool check_start_bytes(std::string);
     bool check_stop_bytes(std::string);
     void replace(std::string &str, std::string substring, std::string replaceable);
+    bool payloadless(uint_fast8_t command);
     bool in_error_state = false;
     uint_fast8_t last_command = 0;
 };

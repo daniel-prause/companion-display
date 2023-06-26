@@ -1,5 +1,6 @@
 #include <SPI.h>
 #include <TFT_eSPI.h> // Hardware-specific library
+#include <EEPROM.h>
 #include "disconnected_image.h"
 #include "serial_comm.h"
 #include "packetizer.h"
@@ -10,6 +11,8 @@ SerialComm comm;
 Packetizer packetizer;
 ImageDecoder image_decoder;
 uint16_t *last_image = new uint16_t[320 * 170]{};
+const char EEPROM_BRIGHTNESS_POS = 0;
+auto current_eeprom_brightness = 0;
 
 void setup()
 {
@@ -23,6 +26,14 @@ void setup()
   tft.setSwapBytes(true);
   tft.setTextPadding(0);
   tft.setTextColor(0);
+  current_eeprom_brightness = EEPROM.read(EEPROM_BRIGHTNESS_POS);
+  if (current_eeprom_brightness == 0)
+  {
+    current_eeprom_brightness = 255;
+  }
+  ledcSetup(0, 10000, 8);
+  ledcAttachPin(38, 0);
+  ledcWrite(0, current_eeprom_brightness);
 }
 
 void loop()
@@ -42,7 +53,7 @@ void loop()
 
   switch (command)
   {
-  case 228:
+  case 228: // set new image
   {
     if (!payload.empty())
     {
@@ -51,22 +62,37 @@ void loop()
     tft.pushImage(0, 0, 320, 170, last_image);
     break;
   }
-  case 229:
+  case 229: // re-use last image
   {
     tft.pushImage(0, 0, 320, 170, last_image);
     break;
   }
-  case 18:
+  case 18: // sleep == set brightness to zero
     ledcSetup(0, 10000, 8);
     ledcAttachPin(38, 0);
     ledcWrite(0, 0);
     sleeping = true;
     break;
-  case 19:
+  case 19: // wake up == set brightness to 255
     ledcSetup(0, 10000, 8);
     ledcAttachPin(38, 0);
-    ledcWrite(0, 255);
+    ledcWrite(0, current_eeprom_brightness);
     sleeping = false;
+    break;
+  case 20: // set brightness to payload
+    auto brightness = payload[0];
+    if (brightness != current_eeprom_brightness)
+    {
+      EEPROM.write(EEPROM_BRIGHTNESS_POS, brightness);
+      EEPROM.commit(); // debounce me!
+      current_eeprom_brightness = brightness;
+    }
+    if (!sleeping)
+    {
+      ledcSetup(0, 10000, 8);
+      ledcAttachPin(38, 0);
+      ledcWrite(0, brightness);
+    }
     break;
   }
 

@@ -34,7 +34,9 @@ std::tuple<uint8_t, std::string> Packetizer::next_packet() // can be of length 0
     {
         last_command = backlog[0];
         backlog.erase(0, 1);
-        if (last_command != 0 && last_command != 228)
+        // since there are commands, that don't need a payload at all,
+        // we will return here
+        if (payloadless(last_command))
         {
             auto retval = std::make_tuple(last_command, std::string());
             last_command = 0;
@@ -93,4 +95,9 @@ void Packetizer::replace(std::string &str, std::string substring, std::string re
         str.replace(pos, substring.length(), replaceable);
         pos += replaceable.length();
     }
+}
+
+bool Packetizer::payloadless(uint_fast8_t command)
+{
+    return command != 0 && command != 228 && command != 20;
 }
