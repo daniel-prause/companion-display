@@ -11,8 +11,7 @@ SerialComm comm;
 Packetizer packetizer;
 ImageDecoder image_decoder;
 uint16_t *last_image = new uint16_t[320 * 170]{};
-const char EEPROM_BRIGHTNESS_POS = 0;
-auto current_eeprom_brightness = 0;
+uint8_t current_eeprom_brightness = 0;
 
 void setup()
 {
@@ -21,12 +20,12 @@ void setup()
   // init tft
   delay(100);
   tft.init();
-  delay(1000);
   tft.setRotation(5);
   tft.setSwapBytes(true);
   tft.setTextPadding(0);
   tft.setTextColor(0);
-  current_eeprom_brightness = EEPROM.read(EEPROM_BRIGHTNESS_POS);
+  EEPROM.begin(1);
+  current_eeprom_brightness = EEPROM.read(0);
   if (current_eeprom_brightness == 0)
   {
     current_eeprom_brightness = 255;
@@ -83,7 +82,7 @@ void loop()
     auto brightness = payload[0];
     if (brightness != current_eeprom_brightness)
     {
-      EEPROM.write(EEPROM_BRIGHTNESS_POS, brightness);
+      EEPROM.write(0, brightness);
       EEPROM.commit(); // debounce me!
       current_eeprom_brightness = brightness;
     }
