@@ -48,8 +48,8 @@ unsigned short ImageDecoder::convert_and_combine(uint8_t r, uint8_t g, uint8_t b
     return combine_bytes(x1, x2);
 }
 
-/* Dither Tresshold for Red Channel */
-static const uint8_t dither_tresshold_r[64] = {
+/* Dither Threshold for Red Channel */
+static const uint8_t dither_threshold_r[64] = {
     1, 7, 3, 5, 0, 8, 2, 6,
     7, 1, 5, 3, 8, 0, 6, 2,
     3, 5, 0, 8, 2, 6, 1, 7,
@@ -60,8 +60,8 @@ static const uint8_t dither_tresshold_r[64] = {
     2, 6, 1, 7, 3, 5, 0, 8,
     6, 2, 7, 1, 5, 3, 8, 0};
 
-/* Dither Tresshold for Green Channel */
-static const uint8_t dither_tresshold_g[64] = {
+/* Dither threshold for Green Channel */
+static const uint8_t dither_threshold_g[64] = {
     1, 3, 2, 2, 3, 1, 2, 2,
     2, 2, 0, 4, 2, 2, 4, 0,
     3, 1, 2, 2, 1, 3, 2, 2,
@@ -72,8 +72,8 @@ static const uint8_t dither_tresshold_g[64] = {
     3, 1, 2, 2, 1, 3, 2, 2,
     2, 2, 4, 0, 2, 2, 0, 4};
 
-/* Dither Tresshold for Blue Channel */
-static const uint8_t dither_tresshold_b[64] = {
+/* Dither threshold for Blue Channel */
+static const uint8_t dither_threshold_b[64] = {
     5, 3, 8, 0, 6, 2, 7, 1,
     3, 5, 0, 8, 2, 6, 1, 7,
     8, 0, 6, 2, 7, 1, 5, 3,
@@ -108,14 +108,14 @@ uint16_t ImageDecoder::dither_xy(
     uint8_t g,
     uint8_t b)
 {
-    /* Get Tresshold Index */
-    uint8_t tresshold_id = ((y & 7) << 3) + (x & 7);
+    /* Get threshold Index */
+    uint8_t threshold_id = ((y & 7) << 3) + (x & 7);
 
     r = ImageDecoder::closest_rb(
-        std::min(r + dither_tresshold_r[tresshold_id], 0xff));
+        std::min(r + dither_threshold_r[threshold_id], 0xff));
     g = ImageDecoder::closest_g(
-        std::min(g + dither_tresshold_g[tresshold_id], 0xff));
+        std::min(g + dither_threshold_g[threshold_id], 0xff));
     b = ImageDecoder::closest_rb(
-        std::min(b + dither_tresshold_b[tresshold_id], 0xff));
+        std::min(b + dither_threshold_b[threshold_id], 0xff));
     return ImageDecoder::RGB16BIT(r, g, b);
 }
