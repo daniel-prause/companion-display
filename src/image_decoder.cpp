@@ -48,7 +48,7 @@ unsigned short ImageDecoder::convert_and_combine(uint8_t r, uint8_t g, uint8_t b
     return combine_bytes(x1, x2);
 }
 
-/* Dither Threshold for Red Channel */
+/* Dither threshold for Red Channel */
 static const uint8_t dither_threshold_r[64] = {
     1, 7, 3, 5, 0, 8, 2, 6,
     7, 1, 5, 3, 8, 0, 6, 2,
